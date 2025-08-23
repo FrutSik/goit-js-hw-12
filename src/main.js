@@ -16,7 +16,14 @@ form.addEventListener('submit', async event => {
   currentQuery = input.value.trim();
   currentPage = 1;
 
-  if (!currentQuery) return;
+  if (!currentQuery) {
+    iziToast.warning({
+      title: 'Input required',
+      message: 'Please enter a search term!',
+      position: 'topRight',
+    });
+    return;
+  }
 
   ui.clearGallery();
   ui.hideLoadMoreButton();
@@ -39,6 +46,12 @@ form.addEventListener('submit', async event => {
 
     if (totalHits > data.hits.length) {
       ui.showLoadMoreButton();
+    } else {
+      iziToast.info({
+        title: 'End',
+        message: "We're sorry, but you've reached the end of search results.",
+        position: 'topRight',
+      });
     }
   } catch (error) {
     iziToast.error({
@@ -54,11 +67,11 @@ form.addEventListener('submit', async event => {
 
 loadMoreBtn.addEventListener('click', async () => {
   currentPage++;
+  ui.hideLoadMoreButton();
   ui.showLoader();
 
   try {
     const data = await api.getImagesByQuery(currentQuery, currentPage);
-
     ui.createGallery(data.hits);
 
     const { height: cardHeight } = document
@@ -70,8 +83,9 @@ loadMoreBtn.addEventListener('click', async () => {
       behavior: 'smooth',
     });
 
-    if (currentPage * 15 >= totalHits) {
-      ui.hideLoadMoreButton();
+    if (currentPage * 15 < totalHits) {
+      ui.showLoadMoreButton();
+    } else {
       iziToast.info({
         title: 'End',
         message: "We're sorry, but you've reached the end of search results.",
