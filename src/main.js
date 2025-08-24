@@ -93,7 +93,11 @@ loadMoreBtn.addEventListener('click', async () => {
       });
     }
   } catch (error) {
-    console.error(error);
+    iziToast.error({
+      title: 'Error',
+      message: 'Failed to load more images. Please try again later.',
+      position: 'topRight',
+    });
   } finally {
     ui.hideLoader();
   }
